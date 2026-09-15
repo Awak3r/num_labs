@@ -9,6 +9,7 @@ import (
 )
 
 func Iterative() {
+	fmt.Println("=== 1.3 Простые итерации и метод Зейделя ===")
 	a, b, eps, err := input.ReadSystemEps("data/iterative.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)

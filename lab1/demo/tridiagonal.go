@@ -9,6 +9,7 @@ import (
 )
 
 func Tridiagonal() {
+	fmt.Println("=== 1.2 Метод прогонки ===")
 	main, super, sub, d, err := input.ReadTridiagonal("data/tridiagonal.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -34,7 +35,7 @@ func Tridiagonal() {
 	ax, _ := a.Multiply(x)
 	fmt.Println("A·x")
 	fmt.Print(ax)
-	fmt.Println("A·x == d:", approxEqual(ax, matrix.Column(d)))
+	fmt.Println("A·x == d:", isEqual(ax, matrix.Column(d)))
 }
 
 func buildTridiagonal(main, super, sub []float64) *matrix.Matrix {

@@ -1,6 +1,5 @@
 package matrix
 
-// Eps — порог «математического нуля» для численных методов.
 const Eps = 1e-12
 
 type Matrix struct {

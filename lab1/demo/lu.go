@@ -9,6 +9,7 @@ import (
 )
 
 func LU() {
+	fmt.Println("=== 1.1 LU-разложение ===")
 	a, b, err := input.ReadSystem("data/lu.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -37,7 +38,7 @@ func LU() {
 	fmt.Print(luProd)
 	fmt.Println("P·A =")
 	fmt.Print(pa)
-	fmt.Println("L·U == P·A:", approxEqual(luProd, pa))
+	fmt.Println("L·U == P·A:", isEqual(luProd, pa))
 
 	x, err := lu.Solve(a, b)
 	if err != nil {
@@ -47,7 +48,7 @@ func LU() {
 	fmt.Println("x =")
 	fmt.Print(x)
 	ax, _ := a.Multiply(x)
-	fmt.Println("A·x == b:", approxEqual(ax, b))
+	fmt.Println("A·x == b:", isEqual(ax, b))
 
 	inv, err := lu.Inverse(a)
 	if err != nil {
@@ -59,7 +60,7 @@ func LU() {
 	ainv, _ := a.Multiply(inv)
 	fmt.Println("A·A⁻¹ =")
 	fmt.Print(ainv)
-	fmt.Println("A·A⁻¹ == E:", approxEqual(ainv, matrix.MakeIdentityMatrix(a.Rows())))
+	fmt.Println("A·A⁻¹ == E:", isEqual(ainv, matrix.MakeIdentityMatrix(a.Rows())))
 
 	det, err := lu.Det(a)
 	if err != nil {
@@ -69,7 +70,7 @@ func LU() {
 	fmt.Println("det(A) =", det)
 }
 
-func approxEqual(x, y *matrix.Matrix) bool {
+func isEqual(x, y *matrix.Matrix) bool {
 	if x.Rows() != y.Rows() || x.Cols() != y.Cols() {
 		return false
 	}

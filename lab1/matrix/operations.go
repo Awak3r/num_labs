@@ -58,7 +58,7 @@ func (m *Matrix) Sub(o *Matrix) (*Matrix, error) {
 	return res, nil
 }
 
-func (m *Matrix) Norm2() float64 {
+func (m *Matrix) Norm2() float64 { //чет гавно
 	var s float64
 	for i := 0; i < m.Rows(); i++ {
 		for j := 0; j < m.Cols(); j++ {
