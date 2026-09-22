@@ -10,7 +10,7 @@ import (
 	"lab1/matrix"
 )
 
-func Numbers(path string) ([]float64, error) {
+func numbers(path string) ([]float64, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("input: %w", err)
@@ -33,113 +33,70 @@ func Numbers(path string) ([]float64, error) {
 	return nums, nil
 }
 
-func ReadMatrix(path string) (*matrix.Matrix, error) {
-	nums, err := Numbers(path)
+func read(path string, withB, withEps bool) (*matrix.Matrix, *matrix.Matrix, float64, error) {
+	nums, err := numbers(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, 0, err
 	}
 	n, err := dimension(nums, path)
 	if err != nil {
-		return nil, err
+		return nil, nil, 0, err
 	}
-	if len(nums) < 1+n*n {
-		return nil, fmt.Errorf("input: %s: нужно %d чисел (n и n² элемента), найдено %d", path, 1+n*n, len(nums))
+	need := 1 + n*n
+	if withB {
+		need += n
 	}
-	m := matrix.Zeros(n, n)
+	if withEps {
+		need++
+	}
+	if len(nums) < need {
+		return nil, nil, 0, fmt.Errorf("input: %s: нужно %d чисел (n, n² элементов A, b если есть, eps если есть), найдено %d", path, need, len(nums))
+	}
+	a := matrix.Zeros(n, n)
 	pos := 1
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
-			m.Set(i, j, nums[pos])
+			a.Set(i, j, nums[pos])
 			pos++
 		}
 	}
-	return m, nil
+	var b *matrix.Matrix
+	if withB {
+		b = matrix.Zeros(n, 1)
+		for i := 0; i < n; i++ {
+			b.Set(i, 0, nums[pos])
+			pos++
+		}
+	}
+	var eps float64
+	if withEps {
+		eps = nums[pos]
+	}
+	return a, b, eps, nil
+}
+
+func ReadMatrix(path string) (*matrix.Matrix, error) {
+	a, _, _, err := read(path, false, false)
+	return a, err
 }
 
 func ReadSystem(path string) (*matrix.Matrix, *matrix.Matrix, error) {
-	nums, err := Numbers(path)
-	if err != nil {
-		return nil, nil, err
-	}
-	n, err := dimension(nums, path)
-	if err != nil {
-		return nil, nil, err
-	}
-	need := 1 + n*n + n
-	if len(nums) < need {
-		return nil, nil, fmt.Errorf("input: %s: нужно %d чисел (n, n² элементов A и n чисел b), найдено %d", path, need, len(nums))
-	}
-	a := matrix.Zeros(n, n)
-	pos := 1
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			a.Set(i, j, nums[pos])
-			pos++
-		}
-	}
-	b := matrix.Zeros(n, 1)
-	for i := 0; i < n; i++ {
-		b.Set(i, 0, nums[pos])
-		pos++
-	}
-	return a, b, nil
+	a, b, _, err := read(path, true, false)
+	return a, b, err
 }
 
 func ReadMatrixEps(path string) (*matrix.Matrix, float64, error) {
-	nums, err := Numbers(path)
-	if err != nil {
-		return nil, 0, err
-	}
-	n, err := dimension(nums, path)
-	if err != nil {
-		return nil, 0, err
-	}
-	need := 1 + n*n + 1
-	if len(nums) < need {
-		return nil, 0, fmt.Errorf("input: %s: нужно %d чисел (n, n² элементов A и eps), найдено %d", path, need, len(nums))
-	}
-	a := matrix.Zeros(n, n)
-	pos := 1
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			a.Set(i, j, nums[pos])
-			pos++
-		}
-	}
-	return a, nums[pos], nil
+	a, _, eps, err := read(path, false, true)
+	return a, eps, err
 }
 
 func ReadSystemEps(path string) (*matrix.Matrix, *matrix.Matrix, float64, error) {
-	nums, err := Numbers(path)
-	if err != nil {
-		return nil, nil, 0, err
-	}
-	n, err := dimension(nums, path)
-	if err != nil {
-		return nil, nil, 0, err
-	}
-	need := 1 + n*n + n + 1
-	if len(nums) < need {
-		return nil, nil, 0, fmt.Errorf("input: %s: нужно %d чисел (n, n² элементов A, n чисел b и eps), найдено %d", path, need, len(nums))
-	}
-	a := matrix.Zeros(n, n)
-	pos := 1
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			a.Set(i, j, nums[pos])
-			pos++
-		}
-	}
-	b := matrix.Zeros(n, 1)
-	for i := 0; i < n; i++ {
-		b.Set(i, 0, nums[pos])
-		pos++
-	}
-	return a, b, nums[pos], nil
+	a, b, eps, err := read(path, true, true)
+	return a, b, eps, err
 }
 
 func ReadTridiagonal(path string) ([]float64, []float64, []float64, []float64, error) {
-	nums, err := Numbers(path)
+	nums, err := numbers(path)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

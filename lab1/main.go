@@ -29,7 +29,7 @@ func main() {
 		io.Copy(io.MultiWriter(orig, f), r)
 	}()
 
-	demo.LU()
+	demo.Iterative()
 
 	w.Close()
 	<-done
