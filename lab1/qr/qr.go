@@ -65,7 +65,7 @@ func Factor(a *matrix.Matrix) (*matrix.Matrix, *matrix.Matrix, error) {
 	return q, r, nil
 }
 
-func Eigenvalues(a *matrix.Matrix, maxIter int) ([]float64, bool, error) {
+func Find(a *matrix.Matrix, maxIter int) ([]float64, bool, error) {
 	n := a.Rows()
 	if a.Cols() != n {
 		return nil, false, fmt.Errorf("qr: матрица не квадратная (%dx%d)", n, a.Cols())

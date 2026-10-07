@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import sys
+
 import numpy as np
 
-nums = list(map(float, open("data/qr.txt").read().split()))
+nums = list(map(float, open(sys.argv[1] if len(sys.argv) > 1 else "data/qr.txt").read().split()))
 n = int(nums[0])
 a = np.array(nums[1 : 1 + n * n]).reshape(n, n)
 
@@ -11,5 +13,3 @@ for i, l in enumerate(eig):
         print(f"λ{i} = {l.real:.6f}")
     else:
         print(f"λ{i} = {l.real:.6f} {l.imag:+.6f}i")
-print(f"сумма СЗ = {eig.sum():.6f}, trace(A) = {np.trace(a):.6f}")
-print(f"произведение СЗ = {eig.prod():.6f}, det(A) = {np.linalg.det(a):.6f}")

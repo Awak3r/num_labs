@@ -92,6 +92,25 @@ func (m *Matrix) Transpose() *Matrix {
 
 func (m *Matrix) Copy() *Matrix { return Create(m.body) }
 
+func (m *Matrix) ApproxEqual(o *Matrix) bool {
+	return m.ApproxEqualTol(o, Eps)
+}
+
+func (m *Matrix) ApproxEqualTol(o *Matrix, tol float64) bool {
+	if m.Rows() != o.Rows() || m.Cols() != o.Cols() {
+		return false
+	}
+	for i := 0; i < m.Rows(); i++ {
+		for j := 0; j < m.Cols(); j++ {
+			d := m.body[i][j] - o.body[i][j]
+			if d > tol || d < -tol {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func (m *Matrix) SwapRows(i, j int) error {
 	if i < 0 || i >= m.Rows() || j < 0 || j >= m.Rows() {
 		return fmt.Errorf("SwapRows: индекс вне диапазона (i=%d, j=%d), строк: %d", i, j, m.Rows())

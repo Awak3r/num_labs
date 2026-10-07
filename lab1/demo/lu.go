@@ -38,7 +38,7 @@ func LU() {
 	fmt.Print(luProd)
 	fmt.Println("P·A =")
 	fmt.Print(pa)
-	fmt.Println("L·U == P·A:", isEqual(luProd, pa))
+	fmt.Println("L·U == P·A:", luProd.ApproxEqual(pa))
 
 	x, err := lu.Solve(a, b)
 	if err != nil {
@@ -48,7 +48,7 @@ func LU() {
 	fmt.Println("x =")
 	fmt.Print(x)
 	ax, _ := a.Multiply(x)
-	fmt.Println("A·x == b:", isEqual(ax, b))
+	fmt.Println("A·x == b:", ax.ApproxEqual(b))
 
 	inv, err := lu.Inverse(a)
 	if err != nil {
@@ -60,7 +60,7 @@ func LU() {
 	ainv, _ := a.Multiply(inv)
 	fmt.Println("A·A⁻¹ =")
 	fmt.Print(ainv)
-	fmt.Println("A·A⁻¹ == E:", isEqual(ainv, matrix.MakeIdentityMatrix(a.Rows())))
+	fmt.Println("A·A⁻¹ == E:", ainv.ApproxEqual(matrix.MakeIdentityMatrix(a.Rows())))
 
 	det, err := lu.Det(a)
 	if err != nil {
@@ -68,19 +68,4 @@ func LU() {
 		return
 	}
 	fmt.Println("det(A) =", det)
-}
-
-func isEqual(x, y *matrix.Matrix) bool {
-	if x.Rows() != y.Rows() || x.Cols() != y.Cols() {
-		return false
-	}
-	for i := 0; i < x.Rows(); i++ {
-		for j := 0; j < x.Cols(); j++ {
-			d := x.Get(i, j) - y.Get(i, j)
-			if d > matrix.Eps || d < -matrix.Eps {
-				return false
-			}
-		}
-	}
-	return true
 }

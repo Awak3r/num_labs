@@ -19,16 +19,14 @@ func Solve(a *matrix.Matrix, eps float64, maxIter int) ([]float64, *matrix.Matri
 			}
 		}
 	}
-
 	work := a.Copy()
 	v := matrix.MakeIdentityMatrix(n)
-
 	var iters int
 	for iters = 0; iters < maxIter; iters++ {
-		p, q, m := maxOffDiag(work)
-		if m < eps {
+		if offDiagNorm(work) < eps {
 			break
 		}
+		p, q, _ := maxOffDiag(work)
 		theta := (work.Get(q, q) - work.Get(p, p)) / (2 * work.Get(p, q))
 		t := 1.0
 		if theta != 0 {
@@ -42,7 +40,6 @@ func Solve(a *matrix.Matrix, eps float64, maxIter int) ([]float64, *matrix.Matri
 	if iters == maxIter {
 		return nil, nil, 0, fmt.Errorf("jacobi: не сошёлся за %d вращений", maxIter)
 	}
-
 	vals := make([]float64, n)
 	for i := 0; i < n; i++ {
 		vals[i] = work.Get(i, i)
@@ -61,6 +58,16 @@ func maxOffDiag(a *matrix.Matrix) (int, int, float64) {
 		}
 	}
 	return p, q, m
+}
+
+func offDiagNorm(a *matrix.Matrix) float64 {
+	var s float64
+	for i := 1; i < a.Rows(); i++ {
+		for j := 0; j < i; j++ {
+			s += a.Get(i, j) * a.Get(i, j)
+		}
+	}
+	return math.Sqrt(s)
 }
 
 func rotateA(a *matrix.Matrix, p, q int, c, s float64) {

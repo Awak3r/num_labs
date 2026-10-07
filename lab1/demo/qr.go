@@ -5,7 +5,6 @@ import (
 	"os/exec"
 
 	"lab1/input"
-	"lab1/lu"
 	"lab1/matrix"
 	"lab1/qr"
 )
@@ -28,9 +27,8 @@ func QR() {
 	printMatrix("R", r)
 	qrProd, _ := q.Multiply(r)
 	printMatrix("Q·R", qrProd)
-	fmt.Println("Q·R == A:", isEqual(qrProd, a))
 
-	real, hasPair, err := qr.Eigenvalues(a, 1000)
+	real, hasPair, err := qr.Find(a, 1000)
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
@@ -39,32 +37,38 @@ func QR() {
 		fmt.Println("вещественные собственные значения:", real)
 	}
 	if hasPair {
-		fmt.Println("комплексно-сопряжённая пара (через NumPy, разрешено ТЗ):")
+		fmt.Println("комплексно-сопряжённая пара:")
 		out, err := exec.Command("python3", "qr/pair.py").Output()
 		if err != nil {
 			fmt.Println("не удалось запустить qr/pair.py (нужен python3+NumPy):", err)
 			return
 		}
 		fmt.Print(string(out))
-		return
 	}
 
-	tr := 0.0
-	for i := 0; i < a.Rows(); i++ {
-		tr += a.Get(i, i)
-	}
-	sum, prod := 0.0, 1.0
-	for _, l := range real {
-		sum += l
-		prod *= l
-	}
-	det, err := lu.Det(a)
+	fmt.Println("--- свой пример: матрица с комплексно-сопряжёнными СЗ ---")
+	ex, err := input.ReadMatrix("data/qr_example.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Printf("проверка: сумма СЗ = %g, trace(A) = %g\n", sum, tr)
-	fmt.Printf("проверка: произведение СЗ = %g, det(A) = %g\n", prod, det)
+	printMatrix("A", ex)
+	_, exHasPair, err := qr.Find(ex, 1000)
+	if err != nil {
+		fmt.Println("ошибка:", err)
+		return
+	}
+	if !exHasPair {
+		fmt.Println("комплексная пара не обнаружена qr.Find — неожиданно")
+		return
+	}
+	fmt.Println("комплексно-сопряжённая пара:")
+	out, err := exec.Command("python3", "qr/pair.py", "data/qr_example.txt").Output()
+	if err != nil {
+		fmt.Println("не удалось запустить qr/pair.py (нужен python3+NumPy):", err)
+		return
+	}
+	fmt.Print(string(out))
 }
 
 func printMatrix(name string, m *matrix.Matrix) {

@@ -37,5 +37,5 @@ func Jacobi() {
 	fmt.Print(av)
 	fmt.Println("V·Λ =")
 	fmt.Print(vlam)
-	fmt.Println("A·V == V·Λ:", isEqual(av, vlam))
+	fmt.Println("A·V == V·Λ (допуск ε):", av.ApproxEqualTol(vlam, eps))
 }
