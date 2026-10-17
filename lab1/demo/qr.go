@@ -2,7 +2,6 @@ package demo
 
 import (
 	"fmt"
-	"os/exec"
 
 	"lab1/input"
 	"lab1/matrix"
@@ -28,7 +27,7 @@ func QR() {
 	qrProd, _ := q.Multiply(r)
 	printMatrix("Q·R", qrProd)
 
-	real, hasPair, err := qr.Find(a, 1000)
+	real, pairs, err := qr.Find(a, 1000)
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
@@ -36,15 +35,7 @@ func QR() {
 	if len(real) > 0 {
 		fmt.Println("вещественные собственные значения:", real)
 	}
-	if hasPair {
-		fmt.Println("комплексно-сопряжённая пара:")
-		out, err := exec.Command("python3", "qr/pair.py").Output()
-		if err != nil {
-			fmt.Println("не удалось запустить qr/pair.py (нужен python3+NumPy):", err)
-			return
-		}
-		fmt.Print(string(out))
-	}
+	printPairs(pairs)
 
 	fmt.Println("--- свой пример: матрица с комплексно-сопряжёнными СЗ ---")
 	ex, err := input.ReadMatrix("data/qr_example.txt")
@@ -53,22 +44,26 @@ func QR() {
 		return
 	}
 	printMatrix("A", ex)
-	_, exHasPair, err := qr.Find(ex, 1000)
+	_, exPairs, err := qr.Find(ex, 1000)
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	if !exHasPair {
+	if len(exPairs) == 0 {
 		fmt.Println("комплексная пара не обнаружена qr.Find — неожиданно")
 		return
 	}
-	fmt.Println("комплексно-сопряжённая пара:")
-	out, err := exec.Command("python3", "qr/pair.py", "data/qr_example.txt").Output()
-	if err != nil {
-		fmt.Println("не удалось запустить qr/pair.py (нужен python3+NumPy):", err)
+	printPairs(exPairs)
+}
+
+func printPairs(pairs []qr.Pair) {
+	if len(pairs) == 0 {
 		return
 	}
-	fmt.Print(string(out))
+	fmt.Println("комплексно-сопряжённая пара:")
+	for _, p := range pairs {
+		fmt.Printf("λ = %.6f %+.6fi\n", p.Re, p.Im)
+	}
 }
 
 func printMatrix(name string, m *matrix.Matrix) {

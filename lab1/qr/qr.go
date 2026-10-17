@@ -65,10 +65,13 @@ func Factor(a *matrix.Matrix) (*matrix.Matrix, *matrix.Matrix, error) {
 	return q, r, nil
 }
 
-func Find(a *matrix.Matrix, maxIter int) ([]float64, bool, error) {
+// Pair — комплексно-сопряжённая пара собственных значений.
+type Pair struct{ Re, Im float64 }
+
+func Find(a *matrix.Matrix, maxIter int) ([]float64, []Pair, error) {
 	n := a.Rows()
 	if a.Cols() != n {
-		return nil, false, fmt.Errorf("qr: матрица не квадратная (%dx%d)", n, a.Cols())
+		return nil, nil, fmt.Errorf("qr: матрица не квадратная (%dx%d)", n, a.Cols())
 	}
 	b := a.Copy()
 	scale := 1 + b.Norm2()
@@ -76,11 +79,11 @@ func Find(a *matrix.Matrix, maxIter int) ([]float64, bool, error) {
 	for it := 0; it < maxIter; it++ {
 		q, r, err := Factor(b)
 		if err != nil {
-			return nil, false, err
+			return nil, nil, err
 		}
 		b, err = r.Multiply(q)
 		if err != nil {
-			return nil, false, err
+			return nil, nil, err
 		}
 		if maxSubDiag(b) <= matrix.Eps*scale {
 			break
@@ -88,21 +91,34 @@ func Find(a *matrix.Matrix, maxIter int) ([]float64, bool, error) {
 	}
 
 	tol := matrix.Eps * scale
-	hasPair := maxSubDiag(b) > tol
-	var real []float64
+	var reals []float64
+	var pairs []Pair
 	for i := 0; i < n; {
 		sub := 0.0
 		if i+1 < n {
 			sub = math.Abs(b.Get(i+1, i))
 		}
 		if sub <= tol {
-			real = append(real, b.Get(i, i))
+			reals = append(reals, b.Get(i, i))
 			i++
-		} else {
-			i += 2
+			continue
 		}
+		// блок 2×2 с комплексными СЗ: λ = m ± √q, q = ((a−d)/2)² + bc
+		a11, a12 := b.Get(i, i), b.Get(i, i+1)
+		a21, a22 := b.Get(i+1, i), b.Get(i+1, i+1)
+		m := (a11 + a22) / 2
+		q := (a11-a22)*(a11-a22)/4 + a12*a21
+		if q > 0 {
+			// вещественные СЗ блока (блок ещё не сошёлся)
+			s := math.Sqrt(q)
+			reals = append(reals, m+s, m-s)
+		} else {
+			im := math.Sqrt(-q)
+			pairs = append(pairs, Pair{m, im}, Pair{m, -im})
+		}
+		i += 2
 	}
-	return real, hasPair, nil
+	return reals, pairs, nil
 }
 
 func maxSubDiag(a *matrix.Matrix) float64 {

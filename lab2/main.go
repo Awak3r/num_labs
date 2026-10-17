@@ -30,6 +30,7 @@ func main() {
 	}()
 
 	demo.Equation()
+	demo.System()
 
 	w.Close()
 	<-done
