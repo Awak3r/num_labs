@@ -8,8 +8,7 @@ import (
 // Func — правая часть системы первого порядка u' = f(x, u).
 type Func func(x float64, u []float64) []float64
 
-// Euler — явный метод Эйлера (порядок p = 1):
-// u_{k+1} = u_k + h·f(x_k, u_k).
+// Euler — явный метод Эйлера (p = 1).
 func Euler(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, error) {
 	xs, n, err := nodes(x0, xk, h)
 	if err != nil {
@@ -76,9 +75,7 @@ func rk4Step(f Func, x float64, u []float64, h float64) ([]float64, error) {
 	return u, nil
 }
 
-// Adams4 — явный метод Адамса 4-го порядка (p = 4):
-// u_{k+1} = u_k + h/24·(55f_k − 59f_{k−1} + 37f_{k−2} − 9f_{k−3}).
-// Разгон (первые 3 шага) — методом Рунге-Кутты 4-го порядка.
+// Adams4 — явный метод Адамса 4-го порядка (p = 4); разгон — РК4.
 func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, error) {
 	xs, n, err := nodes(x0, xk, h)
 	if err != nil {
@@ -105,7 +102,7 @@ func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, er
 			return nil, nil, fmt.Errorf("ode: адамс: f вне области определения при x = %g", xs[k])
 		}
 	}
-	// шаги Адамса: u_{k+1} = u_k + h/24·(55f_k − 59f_{k−1} + 37f_{k−2} − 9f_{k−3})
+	// шаги Адамса
 	for k := 3; k < n; k++ {
 		du := axpy(axpy(axpy(scale(fs[k], 55), fs[k-1], -59), fs[k-2], 37), fs[k-3], -9)
 		u = axpy(u, du, h/24)

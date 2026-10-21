@@ -18,7 +18,7 @@ func Cauchy() {
 	fmt.Printf("отрезок: x ∈ [%g, %g]; шаги: h1 = %g, h2 = %g\n", x0, xk, h1, h2)
 	fmt.Println("точное решение: y(x) = e^(x^2) + e^(x√2) + e^(−x√2)")
 
-	// решения с основным шагом h1 и с h2 (для оценки погрешности по Рунге-Ромбергу)
+	// решения с шагом h1 и с h2 (для Рунге-Ромберга)
 	xsE, usE, err := ode.Euler(funcs.FCauchy, x0, xk, h1, funcs.CauchyU0())
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -60,7 +60,7 @@ func Cauchy() {
 			xsE[i], ysE[i], ysR[i], ysA[i], funcs.ExactCauchy(xsE[i]))
 	}
 
-	fmt.Printf("погрешности решения с шагом h1 = %g (макс. по узлам; Рунге-Ромберг: ε = max|y_h1 − y_h2|/(1 − 2^(−p))):\n", h1)
+	fmt.Println("погрешности численного решения (макс. по узлам):")
 	fmt.Printf("%-10s %3s %20s %22s\n", "метод", "p", "ε_Рунге-Ромберг", "ε_сравнение_с_точным")
 	rows := []struct {
 		name string

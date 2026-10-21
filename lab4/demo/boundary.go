@@ -19,15 +19,15 @@ func Boundary() {
 	fmt.Printf("отрезок: x ∈ [%g, %g]; шаги: h1 = %g, h2 = %g; eps = %g\n", x0, xk, h1, h2, eps)
 	fmt.Println("точное решение: y(x) = 1 + 1/x")
 
-	// --- метод стрельбы: y'(x0) = −1 задано, подбирается s = y(x0) ---
+	// --- метод стрельбы: подбирается s = y(x0) ---
 	s, iters, xsS, usS, err := shooting.Solve(funcs.FBoundary, x0, xk, funcs.DU0(),
 		funcs.ShootS0(), funcs.ShootS1(), h1, eps, 100, funcs.RightResidual)
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Println("--- метод стрельбы (интегрирование — РК4) ---")
-	fmt.Printf("найденное s = y(%g) = %g, итераций секущих: %d\n", x0, s, iters)
+	fmt.Println("--- метод стрельбы ---")
+	fmt.Printf("s = y(%g) = %g, итераций секущих: %d\n", x0, s, iters)
 	_, _, xsS2, usS2, err := shooting.Solve(funcs.FBoundary, x0, xk, funcs.DU0(),
 		funcs.ShootS0(), funcs.ShootS1(), h2, eps, 100, funcs.RightResidual)
 	if err != nil {
@@ -59,7 +59,7 @@ func Boundary() {
 			xsS[i], ysS[i], ysD[i], funcs.ExactBoundary(xsS[i]))
 	}
 
-	fmt.Printf("погрешности решения с шагом h1 = %g (макс. по узлам; Рунге-Ромберг: ε = max|y_h1 − y_h2|/(1 − 2^(−p))):\n", h1)
+	fmt.Println("погрешности численного решения (макс. по узлам):")
 	fmt.Printf("%-12s %3s %20s %22s\n", "метод", "p", "ε_Рунге-Ромберг", "ε_сравнение_с_точным")
 	rrS, err := rungeError(h1, h2, 4, xsS, ysS, xsS2, ysS2)
 	if err != nil {
