@@ -50,5 +50,5 @@ func Integrate() {
 			best = r
 		}
 	}
-	fmt.Printf("наиболее точный метод (мин. |J(h2)−F|): %s (%g)\n", best.name, best.absDiff)
+	fmt.Printf("наиболее точный метод: %s — %g\n", best.name, best.absDiff)
 }

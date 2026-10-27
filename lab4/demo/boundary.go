@@ -57,7 +57,7 @@ func Boundary() {
 			xsS[i], ysS[i], ysD[i], funcs.ExactBoundary(xsS[i]))
 	}
 
-	fmt.Println("погрешности численного решения (макс. по узлам):")
+	fmt.Println("погрешности численного решения:")
 	fmt.Printf("%-12s %3s %20s %22s\n", "метод", "p", "ε_Рунге-Ромберг", "ε_сравнение_с_точным")
 	rrS, err := rungeError(h1, h2, 4, xsS, ysS, xsS2, ysS2)
 	if err != nil {

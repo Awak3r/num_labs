@@ -10,7 +10,7 @@ import (
 )
 
 func System() {
-	fmt.Println("=== 2.1 Система НУ (a = 4): (x1^2+16)x2-64=0; (x1-2)^2+(x2-2)^2-16=0 ===")
+	fmt.Println("=== 2.2 Система НУ: (x1^2+16)x2-64=0; (x1-2)^2+(x2-2)^2-16=0 ===")
 	_, eps, x0v, err := input.ReadSystem("data/system.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -18,8 +18,8 @@ func System() {
 	}
 	x0 := matrix.Column(x0v)
 	fmt.Println("ε =", eps)
-	fmt.Println("начальное приближение (графически): x0 =", funcs.VectorString(x0))
-	fmt.Println("эталон (сборник): x1 = 5.9293, x2 = 1.2511")
+	fmt.Println("начальное приближение: x0 =", funcs.VectorString(x0))
+	fmt.Println("эталон: x1 = 5.9293, x2 = 1.2511")
 
 	fmt.Println("--- метод простой итерации ---")
 	xSI, nSI, stepsSI, err := system.SimpleIterations(funcs.PhiSystem, x0, eps, maxIter)
@@ -27,7 +27,7 @@ func System() {
 		fmt.Println("ошибка:", err)
 	} else {
 		printStepsVector(stepsSI)
-		fmt.Printf("решение (простые итерации): %s, итераций: %d\n", funcs.VectorString(xSI), nSI)
+		fmt.Printf("решение простых итераций: %s, итераций: %d\n", funcs.VectorString(xSI), nSI)
 		fmt.Printf("невязка: f1 = %+.2e, f2 = %+.2e\n", funcs.F1(xSI), funcs.F2(xSI))
 	}
 
@@ -38,7 +38,7 @@ func System() {
 		return
 	}
 	printStepsVector(stepsN)
-	fmt.Printf("решение (Ньютон): %s, итераций: %d\n", funcs.VectorString(xN), nN)
+	fmt.Printf("решение Ньютона: %s, итераций: %d\n", funcs.VectorString(xN), nN)
 	fmt.Printf("невязка: f1 = %+.2e, f2 = %+.2e\n", funcs.F1(xN), funcs.F2(xN))
 
 	fmt.Println("--- анализ сходимости ---")
@@ -65,7 +65,7 @@ func System() {
 	}
 	fmt.Printf("Ньютон сошёлся за %d итераций, простые итерации — за %d: ", nN, nSI)
 	if nN < nSI {
-		fmt.Println("Ньютон сходится быстрее (квадратичная сходимость)")
+		fmt.Println("Ньютон сходится быстрее — квадратичная сходимость")
 	} else if nN > nSI {
 		fmt.Println("простые итерации сошлись быстрее")
 	} else {

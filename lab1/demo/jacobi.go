@@ -28,7 +28,7 @@ func Jacobi() {
 	fmt.Println("собственные значения:", vals)
 	fmt.Println("матрица собственных векторов V =")
 	fmt.Print(v)
-	fmt.Println("итераций (вращений):", iters)
+	fmt.Println("итераций вращений:", iters)
 
 	lam := matrix.Diagonal(vals)
 	av, _ := a.Multiply(v)
@@ -37,5 +37,5 @@ func Jacobi() {
 	fmt.Print(av)
 	fmt.Println("V·Λ =")
 	fmt.Print(vlam)
-	fmt.Println("A·V == V·Λ (допуск ε):", av.ApproxEqualTol(vlam, eps))
+	fmt.Println("A·V == V·Λ:", av.ApproxEqualTol(vlam, eps))
 }

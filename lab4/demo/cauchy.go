@@ -59,7 +59,7 @@ func Cauchy() {
 			xsE[i], ysE[i], ysR[i], ysA[i], funcs.ExactCauchy(xsE[i]))
 	}
 
-	fmt.Println("погрешности численного решения (макс. по узлам):")
+	fmt.Println("погрешности численного решения:")
 	fmt.Printf("%-10s %3s %20s %22s\n", "метод", "p", "ε_Рунге-Ромберг", "ε_сравнение_с_точным")
 	rows := []struct {
 		name string

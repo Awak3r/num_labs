@@ -14,7 +14,7 @@ func LSM() {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Println("исходные точки (xi, yi):")
+	fmt.Println("исходные точки:")
 	for i := range pts.X {
 		fmt.Printf("  (%8.4f, %12.6f)\n", pts.X[i], pts.Y[i])
 	}
@@ -36,5 +36,5 @@ func LSM() {
 			bestSSE = sse
 		}
 	}
-	fmt.Printf("наилучший многочлен (мин. SSE): %s (SSE = %g)\n", best, bestSSE)
+	fmt.Printf("наилучший многочлен: %s, SSE = %g\n", best, bestSSE)
 }

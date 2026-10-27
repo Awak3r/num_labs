@@ -8,13 +8,13 @@ import (
 )
 
 func Spline() {
-	fmt.Println("=== 3.2 Кубический сплайн (S''(x0)=S''(x4)=0), x* = 1.5 ===")
+	fmt.Println("=== 3.2 Кубический сплайн, x* = 1.5 ===")
 	pts, err := input.ReadPointsXstar("data/spline.txt")
 	if err != nil {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Println("исходные узлы (xi, yi):")
+	fmt.Println("исходные узлы:")
 	for i := range pts.X {
 		fmt.Printf("  x%d = %8.4f   y%d = %12.6f\n", i, pts.X[i], i, pts.Y[i])
 	}
@@ -32,7 +32,7 @@ func Spline() {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Printf("S(x*) = S_%d(%g) = %12.6f (интервал %d: [%g, %g])\n", idx, pts.XStar, v, idx, sp.Pieces[idx-1].X0, sp.Pieces[idx-1].X1)
+	fmt.Printf("S(x*) = S_%d(%g) = %12.6f\n", idx, pts.XStar, v)
 	fmt.Println("проверка прохождения через узлы:")
 	ok := true
 	for i := range sp.X {
@@ -62,7 +62,7 @@ func Spline() {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Printf("граничные условия: S''(x0) = %g (должно быть 0), S''(x4) = %g (должно быть 0)\n", d0, dn)
+	fmt.Printf("граничные условия: S''(x0) = %g, S''(x4) = %g\n", d0, dn)
 }
 
 func abs(v float64) float64 {

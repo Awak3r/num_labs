@@ -16,8 +16,8 @@ func Equation() {
 		return
 	}
 	fmt.Println("ε =", eps)
-	fmt.Println("начальное приближение (графически): x0 =", x0)
-	fmt.Println("эталон (сборник): положительный корень x ≈ 0.0915")
+	fmt.Println("начальное приближение: x0 =", x0)
+	fmt.Println("эталон: положительный корень x ≈ 0.0915")
 
 	xSI, nSI, stepsSI, err := equation.SimpleIterations(funcs.Phi, funcs.F, x0, eps, maxIter)
 	if err != nil {
@@ -54,6 +54,6 @@ func Equation() {
 		fmt.Printf("   %3d   |  %s  |  %s\n", i+1, c1, c2)
 	}
 
-	fmt.Printf("корень (простые итерации): x = %.6f, итераций: %d\n", xSI, nSI)
-	fmt.Printf("корень (Ньютон):           x = %.6f, итераций: %d\n", xN, nN)
+	fmt.Printf("корень простых итераций: x = %.6f, итераций: %d\n", xSI, nSI)
+	fmt.Printf("корень Ньютона:           x = %.6f, итераций: %d\n", xN, nN)
 }

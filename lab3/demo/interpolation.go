@@ -11,7 +11,7 @@ import (
 
 func printDividedDiff(nodes []interpolation.Node) {
 	d := interpolation.DividedDifferences(nodes)
-	fmt.Println("таблица разделённых разностей (k — порядок разности):")
+	fmt.Println("таблица разделённых разностей:")
 	fmt.Printf("      ")
 	for i := range nodes {
 		fmt.Printf("%14.4f", nodes[i].X)
@@ -27,7 +27,7 @@ func printDividedDiff(nodes []interpolation.Node) {
 }
 
 func interpolationSet(name, path string) {
-	fmt.Printf("--- набор %s (%s) ---\n", name, path)
+	fmt.Printf("--- набор %s: %s ---\n", name, path)
 	xs, xstar, err := input.ReadNodesXstar(path)
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -37,7 +37,7 @@ func interpolationSet(name, path string) {
 	for i, xv := range xs {
 		nodes[i] = interpolation.Node{X: xv, Y: funcs.Tan(xv)}
 	}
-	fmt.Println("исходные узлы (xi, yi=tan(xi)):")
+	fmt.Println("исходные узлы:")
 	for i := range nodes {
 		fmt.Printf("  x%d = %12.8f   y%d = %12.8f\n", i, nodes[i].X, i, nodes[i].Y)
 	}
@@ -45,10 +45,10 @@ func interpolationSet(name, path string) {
 
 	lag := interpolation.Lagrange(nodes)
 	newt := interpolation.Newton(nodes)
-	fmt.Println("многочлен Лагранжа (аналитический вид):")
+	fmt.Println("многочлен Лагранжа:")
 	fmt.Println("  " + lag.Form)
 	printDividedDiff(nodes)
-	fmt.Println("многочлен Ньютона (аналитический вид):")
+	fmt.Println("многочлен Ньютона:")
 	fmt.Println("  " + newt.Form)
 
 	lv := interpolation.EvalPoly(lag.Coef, xstar)

@@ -23,7 +23,7 @@ func Iterative() {
 		return
 	}
 	fmt.Println("ε =", eps)
-	fmt.Println("эталонное решение (LU):")
+	fmt.Println("эталонное решение через LU:")
 	fmt.Print(ref)
 	xSI, nSI, err := iterative.SimpleIterations(a, b, eps, maxIter)
 	if err != nil {
@@ -37,10 +37,10 @@ func Iterative() {
 	}
 	fmt.Println("простые итерации:")
 	fmt.Print(xSI)
-	fmt.Println("итераций (простые итерации):", nSI)
+	fmt.Println("итераций простых итераций:", nSI)
 	fmt.Println("метод Зейделя:")
 	fmt.Print(xSeidel)
-	fmt.Println("итераций (Зейдель):", nSeidel)
+	fmt.Println("итераций Зейделя:", nSeidel)
 	if nSeidel < nSI {
 		fmt.Println("Зейдель сошёлся быстрее")
 	} else if nSeidel > nSI {
