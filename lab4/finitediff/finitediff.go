@@ -8,13 +8,6 @@ import (
 	"lab4/matrix"
 )
 
-// Solve решает линейную краевую задачу
-//
-//	y'' + p(x)·y' + q(x)·y = r(x),
-//	a0·y(x0) + b0·y'(x0) = g0,   a1·y(xk) + b1·y'(xk) = g1
-//
-// конечно-разностным методом (2-й порядок аппроксимации); система решается
-// LU-разложением.
 func Solve(p, q, r func(float64) float64, x0, xk, h float64,
 	a0, b0, g0, a1, b1, g1 float64) ([]float64, []float64, error) {
 	if h <= 0 || xk <= x0 {
@@ -30,7 +23,7 @@ func Solve(p, q, r func(float64) float64, x0, xk, h float64,
 	}
 	A := matrix.Zeros(n+1, n+1)
 	rhs := matrix.Column(make([]float64, n+1))
-	// левое условие: a0·y0 + b0·(−3y0 + 4y1 − y2)/(2h) = g0
+
 	if b0 == 0 {
 		A.Set(0, 0, a0)
 		rhs.Set(0, 0, g0)
@@ -40,7 +33,7 @@ func Solve(p, q, r func(float64) float64, x0, xk, h float64,
 		A.Set(0, 2, -b0/(2*h))
 		rhs.Set(0, 0, g0)
 	}
-	// внутренние узлы: (y_{i−1} − 2y_i + y_{i+1})/h² + p_i(y_{i+1} − y_{i−1})/(2h) + q_i·y_i = r_i
+
 	for i := 1; i < n; i++ {
 		x := xs[i]
 		A.Set(i, i-1, 1/(h*h)-p(x)/(2*h))
@@ -48,7 +41,7 @@ func Solve(p, q, r func(float64) float64, x0, xk, h float64,
 		A.Set(i, i+1, 1/(h*h)+p(x)/(2*h))
 		rhs.Set(i, 0, r(x))
 	}
-	// правое условие: a1·yN + b1·(3yN − 4y_{N−1} + y_{N−2})/(2h) = g1
+
 	if b1 == 0 {
 		A.Set(n, n, a1)
 		rhs.Set(n, 0, g1)

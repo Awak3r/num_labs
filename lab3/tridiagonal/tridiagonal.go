@@ -7,9 +7,6 @@ import (
 	"lab3/matrix"
 )
 
-// Solve решает трёхдиагональную систему методом прогонки (Томас).
-// main — главная диагональ (n), super — наддиагональ (n-1), sub — поддиагональ (n-1),
-// d — правая часть (n). Возвращает решение x.
 func Solve(main, super, sub, d []float64) ([]float64, error) {
 	n := len(main)
 	if len(super) != n-1 || len(sub) != n-1 || len(d) != n {
@@ -18,7 +15,7 @@ func Solve(main, super, sub, d []float64) ([]float64, error) {
 	if n == 0 {
 		return nil, fmt.Errorf("tridiagonal: пустая система")
 	}
-	// Прямой ход: α, β
+
 	alpha := make([]float64, n)
 	beta := make([]float64, n)
 	if math.Abs(main[0]) < matrix.Eps {
@@ -38,7 +35,7 @@ func Solve(main, super, sub, d []float64) ([]float64, error) {
 		}
 		beta[i] = (d[i] - sub[i-1]*beta[i-1]) / denom
 	}
-	// Обратный ход
+
 	x := make([]float64, n)
 	x[n-1] = beta[n-1]
 	for i := n - 2; i >= 0; i-- {
@@ -46,5 +43,3 @@ func Solve(main, super, sub, d []float64) ([]float64, error) {
 	}
 	return x, nil
 }
-
-

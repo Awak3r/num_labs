@@ -7,11 +7,6 @@ import (
 	"lab4/ode"
 )
 
-// Solve решает краевую задачу стрельбой: в левой точке задана
-// производная y'(x0) = du0, подбирается s = y(x0), при котором
-// невязка правого условия g(u(xk)) = 0. Интегрирование — РК4 с шагом h,
-// корень g(s) = 0 — методом секущих с точностью eps.
-// Возвращает s, число итераций секущих и траекторию (xs, us).
 func Solve(f ode.Func, x0, xk, du0, s0, s1, h, eps float64, maxIter int,
 	g func(u []float64) float64) (float64, int, []float64, [][]float64, error) {
 	if s0 == s1 {
@@ -20,8 +15,7 @@ func Solve(f ode.Func, x0, xk, du0, s0, s1, h, eps float64, maxIter int,
 	if h <= 0 || xk <= x0 {
 		return 0, 0, nil, nil, fmt.Errorf("shooting: некорректные параметры: x0 = %g, xk = %g, h = %g", x0, xk, h)
 	}
-	// G(s) — невязка правого условия после решения задачи Коши с y(x0) = s;
-	// последняя траектория сохраняется для возврата.
+
 	var xs []float64
 	var us [][]float64
 	G := func(s float64) (float64, error) {
@@ -40,7 +34,7 @@ func Solve(f ode.Func, x0, xk, du0, s0, s1, h, eps float64, maxIter int,
 	if err != nil {
 		return 0, 0, nil, nil, fmt.Errorf("shooting: %w", err)
 	}
-	// метод секущих: s_{k+1} = s_k − g(s_k)·(s_k − s_{k−1})/(g(s_k) − g(s_{k−1}))
+
 	for iters := 0; iters < maxIter; iters++ {
 		if math.Abs(g1-g0) < 1e-300 {
 			return 0, 0, nil, nil, fmt.Errorf("shooting: секущие выродились: g(s0) = g(s1) = %g", g1)

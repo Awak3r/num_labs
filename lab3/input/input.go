@@ -37,7 +37,6 @@ func ReadPointsXstar(path string) (Points, error) {
 	}, nil
 }
 
-// ReadNodesXstar читает n, x[] (n штук), x* — для задач, где y вычисляется из функции.
 func ReadNodesXstar(path string) (x []float64, xstar float64, err error) {
 	nums, err := Numbers(path)
 	if err != nil {

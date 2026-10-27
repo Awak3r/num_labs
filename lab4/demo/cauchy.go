@@ -18,7 +18,6 @@ func Cauchy() {
 	fmt.Printf("отрезок: x ∈ [%g, %g]; шаги: h1 = %g, h2 = %g\n", x0, xk, h1, h2)
 	fmt.Println("точное решение: y(x) = e^(x^2) + e^(x√2) + e^(−x√2)")
 
-	// решения с шагом h1 и с h2 (для Рунге-Ромберга)
 	xsE, usE, err := ode.Euler(funcs.FCauchy, x0, xk, h1, funcs.CauchyU0())
 	if err != nil {
 		fmt.Println("ошибка:", err)

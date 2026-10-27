@@ -2,14 +2,12 @@ package integration
 
 import "fmt"
 
-// Method — численный метод интегрирования.
 type Method struct {
 	Name string
-	P    int // порядок точности для Рунге–Ромберга
+	P    int
 	Fn   func(f func(float64) float64, a, b float64, n int) (float64, error)
 }
 
-// Methods — все требуемые методы.
 var Methods = []Method{
 	{"левые прямоугольники", 1, LeftRect},
 	{"правые прямоугольники", 1, RightRect},
@@ -18,17 +16,14 @@ var Methods = []Method{
 	{"Симпсон", 4, Simpson},
 }
 
-// LeftRect — метод левых прямоугольников.
 func LeftRect(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return rects(f, a, b, n, 0)
 }
 
-// RightRect — метод правых прямоугольников.
 func RightRect(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return rects(f, a, b, n, 1)
 }
 
-// MidRect — метод средних прямоугольников.
 func MidRect(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return rects(f, a, b, n, 2)
 }
@@ -54,7 +49,6 @@ func rects(f func(float64) float64, a, b float64, n, kind int) (float64, error) 
 	return sum * h, nil
 }
 
-// Trapezoid — метод трапеций.
 func Trapezoid(f func(float64) float64, a, b float64, n int) (float64, error) {
 	if n < 1 {
 		return 0, fmt.Errorf("integration: n должно быть ≥1, есть %d", n)
@@ -67,7 +61,6 @@ func Trapezoid(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return sum * h, nil
 }
 
-// Simpson — метод Симпсона (парабол), требует чётного n.
 func Simpson(f func(float64) float64, a, b float64, n int) (float64, error) {
 	if n < 2 || n%2 != 0 {
 		return 0, fmt.Errorf("integration: Симпсон требует чётного n ≥2, есть %d", n)
@@ -84,10 +77,6 @@ func Simpson(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return sum * h / 3, nil
 }
 
-// RungeRomberg уточняет значение J2 (мелкий шаг) по J1 (крупный шаг):
-//
-//	J_RR = J2 + (J2 − J1) / (2^p − 1)
-//	R — оценка погрешности J2: |J_RR − J2| / (2^p − 1) … фактически |J2−J1|/(2^p−1).
 func RungeRomberg(j1, j2 float64, p int) (refined, err2 float64) {
 	factor := 1
 	for i := 0; i < p; i++ {

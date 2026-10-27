@@ -65,7 +65,6 @@ func Factor(a *matrix.Matrix) (*matrix.Matrix, *matrix.Matrix, error) {
 	return q, r, nil
 }
 
-// Pair — комплексно-сопряжённая пара собственных значений.
 type Pair struct{ Re, Im float64 }
 
 func Find(a *matrix.Matrix, maxIter int) ([]float64, []Pair, error) {
@@ -103,13 +102,13 @@ func Find(a *matrix.Matrix, maxIter int) ([]float64, []Pair, error) {
 			i++
 			continue
 		}
-		// блок 2×2 с комплексными СЗ: λ = m ± √q, q = ((a−d)/2)² + bc
+
 		a11, a12 := b.Get(i, i), b.Get(i, i+1)
 		a21, a22 := b.Get(i+1, i), b.Get(i+1, i+1)
 		m := (a11 + a22) / 2
 		q := (a11-a22)*(a11-a22)/4 + a12*a21
 		if q > 0 {
-			// вещественные СЗ блока (блок ещё не сошёлся)
+
 			s := math.Sqrt(q)
 			reals = append(reals, m+s, m-s)
 		} else {

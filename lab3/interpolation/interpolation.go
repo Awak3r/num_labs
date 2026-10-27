@@ -14,7 +14,6 @@ type Result struct {
 	Form string
 }
 
-// DividedDifferences строит таблицу разделённых разностей: d[k][i] = f[x_i..x_{i+k}].
 func DividedDifferences(nodes []Node) [][]float64 {
 	n := len(nodes)
 	d := make([][]float64, n)
@@ -31,7 +30,6 @@ func DividedDifferences(nodes []Node) [][]float64 {
 	return d
 }
 
-// Newton возвращает коэффициенты (f[x0..xk]) и аналитический вид N(x).
 func Newton(nodes []Node) Result {
 	n := len(nodes)
 	div := DividedDifferences(nodes)
@@ -59,7 +57,6 @@ func Newton(nodes []Node) Result {
 	return Result{Coef: coefs, Form: sb.String()}
 }
 
-// EvalNewton вычисляет N(x) по схеме Горнера для формы Ньютона.
 func EvalNewton(nodes []Node, coefs []float64, x float64) float64 {
 	n := len(coefs)
 	res := coefs[n-1]
@@ -69,8 +66,6 @@ func EvalNewton(nodes []Node, coefs []float64, x float64) float64 {
 	return res
 }
 
-// Lagrange возвращает коэффициенты многочлена в базисе {1, x, ..., x^{n-1}}
-// (раскрытие скобок) и аналитический вид L(x) в канонической форме.
 func Lagrange(nodes []Node) Result {
 	n := len(nodes)
 	coef := make([]float64, n)
@@ -92,7 +87,6 @@ func Lagrange(nodes []Node) Result {
 	return Result{Coef: coef, Form: form}
 }
 
-// polyString — каноническая запись многочлена по коэффициентам по возрастанию степени.
 func polyString(coef []float64) string {
 	var parts []string
 	for i := len(coef) - 1; i >= 0; i-- {
@@ -109,7 +103,6 @@ func polyString(coef []float64) string {
 	return strings.Join(parts, " ")
 }
 
-// EvalPoly вычисляет значение многочлена с коэффициентами по возрастанию степени.
 func EvalPoly(coef []float64, x float64) float64 {
 	res := 0.0
 	for i := len(coef) - 1; i >= 0; i-- {

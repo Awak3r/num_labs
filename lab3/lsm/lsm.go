@@ -8,8 +8,6 @@ import (
 	"lab3/matrix"
 )
 
-// Fit строит аппроксимирующий многочлен степени degree МНК
-// через нормальную систему A^T·A·c = A^T·y (базис 1, x, ..., x^degree).
 func Fit(x, y []float64, degree int) (Poly, error) {
 	if degree < 1 {
 		return Poly{}, fmt.Errorf("lsm: степень должна быть ≥1, есть %d", degree)
@@ -18,7 +16,7 @@ func Fit(x, y []float64, degree int) (Poly, error) {
 		return Poly{}, fmt.Errorf("lsm: точек %d недостаточно для степени %d", len(x), degree)
 	}
 	m := degree + 1
-	// Матрица A: A[i][j] = x_i^j
+
 	normal := matrix.Zeros(m, m)
 	rhs := matrix.Column(make([]float64, m))
 	for i := 0; i < m; i++ {
@@ -47,7 +45,7 @@ func Fit(x, y []float64, degree int) (Poly, error) {
 }
 
 type Poly struct {
-	Coef []float64 // по возрастанию степени
+	Coef []float64
 }
 
 func (p Poly) Eval(x float64) float64 {
@@ -58,7 +56,6 @@ func (p Poly) Eval(x float64) float64 {
 	return res
 }
 
-// SSE — сумма квадратов ошибок по всем точкам.
 func (p Poly) SSE(x, y []float64) float64 {
 	s := 0.0
 	for i := range x {
@@ -68,7 +65,6 @@ func (p Poly) SSE(x, y []float64) float64 {
 	return s
 }
 
-// Form — аналитический вид строки.
 func (p Poly) Form() string {
 	var parts []string
 	for i := len(p.Coef) - 1; i >= 0; i-- {

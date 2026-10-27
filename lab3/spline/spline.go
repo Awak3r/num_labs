@@ -8,7 +8,7 @@ import (
 
 type Piece struct {
 	A, B, C, D float64
-	X0, X1     float64 // границы интервала действия
+	X0, X1     float64
 	Index      int
 }
 
@@ -18,8 +18,6 @@ type Spline struct {
 	H       []float64
 }
 
-// Build строит кубический сплайн с граничными условиями S''(x0)=S''(xn)=0.
-// На каждом интервале [x_{i-1}, x_i]: S_i(x) = a_i + b_i(x-x_{i-1}) + c_i(x-x_{i-1})^2 + d_i(x-x_{i-1})^3.
 func Build(x, y []float64) (*Spline, error) {
 	n := len(x)
 	if n < 2 || len(y) != n {
@@ -35,9 +33,6 @@ func Build(x, y []float64) (*Spline, error) {
 		h[i] = x[i+1] - x[i]
 	}
 
-	// Система на c: для i=1..n-2:
-	// h[i-1]*c[i-1] + 2(h[i-1]+h[i])*c[i] + h[i]*c[i+1] = 6*((y[i+1]-y[i])/h[i] - (y[i]-y[i-1])/h[i-1])
-	// c[0] = c[n-1] = 0.
 	m := n - 2
 	main := make([]float64, m)
 	super := make([]float64, m-1)
@@ -79,7 +74,6 @@ func Build(x, y []float64) (*Spline, error) {
 	return &Spline{X: x, Y: y, Pieces: pieces, H: h}, nil
 }
 
-// Evaluate вычисляет S(x) и возвращает также индекс интервала (1-based, как в Piece.Index).
 func (s *Spline) Evaluate(x float64) (float64, int, error) {
 	if x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
 		return 0, 0, fmt.Errorf("spline: x=%g вне [%g, %g]", x, s.X[0], s.X[len(s.X)-1])
@@ -96,7 +90,6 @@ func (s *Spline) Evaluate(x float64) (float64, int, error) {
 	return p.A + p.B*t + p.C*t*t + p.D*t*t*t, p.Index, nil
 }
 
-// SecondDerivative вычисляет S''(x) — для проверки граничных условий.
 func (s *Spline) SecondDerivative(x float64) (float64, error) {
 	if x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
 		return 0, fmt.Errorf("spline: x=%g вне диапазона", x)

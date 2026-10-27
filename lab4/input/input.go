@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-// ReadInterval читает x0, xk, h1, h2 — отрезок и два шага сетки
-// (h2 — для оценки погрешности по методу Рунге-Ромберга).
 func ReadInterval(path string) (x0, xk, h1, h2 float64, err error) {
 	nums, err := Numbers(path)
 	if err != nil {
@@ -21,8 +19,6 @@ func ReadInterval(path string) (x0, xk, h1, h2 float64, err error) {
 	return nums[0], nums[1], nums[2], nums[3], nil
 }
 
-// ReadBoundary читает x0, xk, h1, h2, eps — отрезок, два шага сетки
-// и точность метода секущих в стрельбе.
 func ReadBoundary(path string) (x0, xk, h1, h2, eps float64, err error) {
 	nums, err := Numbers(path)
 	if err != nil {

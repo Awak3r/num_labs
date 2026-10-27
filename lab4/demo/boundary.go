@@ -19,7 +19,6 @@ func Boundary() {
 	fmt.Printf("отрезок: x ∈ [%g, %g]; шаги: h1 = %g, h2 = %g; eps = %g\n", x0, xk, h1, h2, eps)
 	fmt.Println("точное решение: y(x) = 1 + 1/x")
 
-	// --- метод стрельбы: подбирается s = y(x0) ---
 	s, iters, xsS, usS, err := shooting.Solve(funcs.FBoundary, x0, xk, funcs.DU0(),
 		funcs.ShootS0(), funcs.ShootS1(), h1, eps, 100, funcs.RightResidual)
 	if err != nil {
@@ -36,7 +35,6 @@ func Boundary() {
 	}
 	ysS, ysS2 := col(usS), col(usS2)
 
-	// --- конечно-разностный метод ---
 	a0, b0, g0 := funcs.BC0()
 	a1, b1, g1 := funcs.BC1()
 	xsD, ysD, err := finitediff.Solve(funcs.PBoundary, funcs.QBoundary, funcs.RBoundary,

@@ -5,10 +5,8 @@ import (
 	"math"
 )
 
-// Func — правая часть системы первого порядка u' = f(x, u).
 type Func func(x float64, u []float64) []float64
 
-// Euler — явный метод Эйлера (p = 1).
 func Euler(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, error) {
 	xs, n, err := nodes(x0, xk, h)
 	if err != nil {
@@ -31,7 +29,6 @@ func Euler(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, err
 	return xs, us, nil
 }
 
-// RK4 — классический метод Рунге-Кутты 4-го порядка (p = 4).
 func RK4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, error) {
 	xs, n, err := nodes(x0, xk, h)
 	if err != nil {
@@ -75,7 +72,6 @@ func rk4Step(f Func, x float64, u []float64, h float64) ([]float64, error) {
 	return u, nil
 }
 
-// Adams4 — явный метод Адамса 4-го порядка (p = 4); разгон — РК4.
 func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, error) {
 	xs, n, err := nodes(x0, xk, h)
 	if err != nil {
@@ -88,7 +84,7 @@ func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, er
 	fs := make([][]float64, n+1)
 	u := clone(u0)
 	us[0] = u
-	// разгон: первые 3 шага РК4
+
 	for k := 0; k < 3; k++ {
 		u, err = rk4Step(f, xs[k], u, h)
 		if err != nil {
@@ -102,7 +98,7 @@ func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, er
 			return nil, nil, fmt.Errorf("ode: адамс: f вне области определения при x = %g", xs[k])
 		}
 	}
-	// шаги Адамса
+
 	for k := 3; k < n; k++ {
 		du := axpy(axpy(axpy(scale(fs[k], 55), fs[k-1], -59), fs[k-2], 37), fs[k-3], -9)
 		u = axpy(u, du, h/24)
@@ -118,7 +114,6 @@ func Adams4(f Func, x0, xk, h float64, u0 []float64) ([]float64, [][]float64, er
 	return xs, us, nil
 }
 
-// nodes — узлы сетки x_i = x0 + i·h, n — число шагов.
 func nodes(x0, xk, h float64) ([]float64, int, error) {
 	if h <= 0 || xk <= x0 {
 		return nil, 0, fmt.Errorf("ode: некорректные параметры: x0 = %g, xk = %g, h = %g", x0, xk, h)
@@ -140,7 +135,6 @@ func clone(u []float64) []float64 {
 	return v
 }
 
-// axpy — a + c·b (новый срез).
 func axpy(a, b []float64, c float64) []float64 {
 	v := make([]float64, len(a))
 	for i := range a {
@@ -149,7 +143,6 @@ func axpy(a, b []float64, c float64) []float64 {
 	return v
 }
 
-// scale — c·a (новый срез).
 func scale(a []float64, c float64) []float64 {
 	v := make([]float64, len(a))
 	for i := range a {
