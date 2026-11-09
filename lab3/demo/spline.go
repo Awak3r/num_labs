@@ -52,6 +52,14 @@ func Spline() {
 	} else {
 		fmt.Println("сплайн проходит через все узлы: НЕТ")
 	}
+	fmt.Println("проверка гладкости во внутренних узлах:")
+	for i := 1; i < len(sp.Pieces); i++ {
+		left, right := sp.Pieces[i-1], sp.Pieces[i]
+		h := left.X1 - left.X0
+		d1 := left.B + 2*left.C*h + 3*left.D*h*h - right.B
+		d2 := 2*left.C + 6*left.D*h - 2*right.C
+		fmt.Printf("  x%d = %g: |ΔS'| = %g, |ΔS''| = %g\n", i, right.X0, abs(d1), abs(d2))
+	}
 	d0, err := sp.SecondDerivative(sp.X[0])
 	if err != nil {
 		fmt.Println("ошибка:", err)
@@ -62,7 +70,7 @@ func Spline() {
 		fmt.Println("ошибка:", err)
 		return
 	}
-	fmt.Printf("граничные условия: S''(x0) = %g, S''(x4) = %g\n", d0, dn)
+	fmt.Printf("граничные условия: S''(x0) = %g, S''(x%d) = %g\n", d0, len(sp.X)-1, dn)
 }
 
 func abs(v float64) float64 {

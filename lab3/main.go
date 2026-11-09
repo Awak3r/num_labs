@@ -30,10 +30,6 @@ func main() {
 	}()
 
 	demo.Interpolation()
-	demo.Spline()
-	demo.LSM()
-	demo.Derivative()
-	demo.Integrate()
 
 	w.Close()
 	<-done

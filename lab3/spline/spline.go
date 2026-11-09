@@ -2,6 +2,7 @@ package spline
 
 import (
 	"fmt"
+	"math"
 
 	"lab3/tridiagonal"
 )
@@ -13,9 +14,9 @@ type Piece struct {
 }
 
 type Spline struct {
-	X, Y    []float64
-	Pieces  []Piece
-	H       []float64
+	X, Y   []float64
+	Pieces []Piece
+	H      []float64
 }
 
 func Build(x, y []float64) (*Spline, error) {
@@ -23,8 +24,13 @@ func Build(x, y []float64) (*Spline, error) {
 	if n < 2 || len(y) != n {
 		return nil, fmt.Errorf("spline: нужно ≥2 узлов и |y|=|x|, есть n=%d, len(y)=%d", n, len(y))
 	}
+	for i := range x {
+		if math.IsNaN(x[i]) || math.IsInf(x[i], 0) || math.IsNaN(y[i]) || math.IsInf(y[i], 0) {
+			return nil, fmt.Errorf("spline: неконечные данные в узле %d", i)
+		}
+	}
 	for i := 1; i < n; i++ {
-		if x[i]-x[i-1] <= 0 {
+		if x[i]-x[i-1] <= 0 || math.IsInf(x[i]-x[i-1], 0) {
 			return nil, fmt.Errorf("spline: узлы должны быть строго возрастающими")
 		}
 	}
@@ -33,27 +39,31 @@ func Build(x, y []float64) (*Spline, error) {
 		h[i] = x[i+1] - x[i]
 	}
 
-	m := n - 2
-	main := make([]float64, m)
-	super := make([]float64, m-1)
-	sub := make([]float64, m-1)
-	d := make([]float64, m)
-	for i := 1; i <= m; i++ {
-		main[i-1] = 2 * (h[i-1] + h[i])
-		d[i-1] = 6 * ((y[i+1]-y[i])/h[i] - (y[i]-y[i-1])/h[i-1])
-		if i > 1 {
-			sub[i-2] = h[i-1]
-		}
-		if i < m {
-			super[i-1] = h[i]
-		}
-	}
-	cSol, err := tridiagonal.Solve(main, super, sub, d)
-	if err != nil {
-		return nil, fmt.Errorf("spline: %w", err)
-	}
 	c := make([]float64, n)
-	copy(c[1:m+1], cSol)
+	m := n - 2
+	// При двух узлах естественный сплайн — прямая, внутренней системы нет.
+	if m > 0 {
+		main := make([]float64, m)
+		super := make([]float64, m-1)
+		sub := make([]float64, m-1)
+		d := make([]float64, m)
+		for i := 1; i <= m; i++ {
+			main[i-1] = 2 * (h[i-1] + h[i])
+			// c_i = S''(x_i)/2, поэтому множитель справа равен 3, а не 6.
+			d[i-1] = 3 * ((y[i+1]-y[i])/h[i] - (y[i]-y[i-1])/h[i-1])
+			if i > 1 {
+				sub[i-2] = h[i-1]
+			}
+			if i < m {
+				super[i-1] = h[i]
+			}
+		}
+		cSol, err := tridiagonal.Solve(main, super, sub, d)
+		if err != nil {
+			return nil, fmt.Errorf("spline: %w", err)
+		}
+		copy(c[1:m+1], cSol)
+	}
 
 	b := make([]float64, n)
 	a := make([]float64, n)
@@ -62,6 +72,9 @@ func Build(x, y []float64) (*Spline, error) {
 		a[i] = y[i-1]
 		b[i] = (y[i]-y[i-1])/h[i-1] - h[i-1]*(c[i]+2*c[i-1])/3
 		dd[i] = (c[i] - c[i-1]) / (3 * h[i-1])
+		if math.IsNaN(b[i]) || math.IsInf(b[i], 0) || math.IsNaN(dd[i]) || math.IsInf(dd[i], 0) {
+			return nil, fmt.Errorf("spline: неконечные коэффициенты участка %d", i)
+		}
 	}
 
 	pieces := make([]Piece, n-1)
@@ -75,7 +88,7 @@ func Build(x, y []float64) (*Spline, error) {
 }
 
 func (s *Spline) Evaluate(x float64) (float64, int, error) {
-	if x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
+	if math.IsNaN(x) || math.IsInf(x, 0) || x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
 		return 0, 0, fmt.Errorf("spline: x=%g вне [%g, %g]", x, s.X[0], s.X[len(s.X)-1])
 	}
 	for i := 1; i < len(s.X); i++ {
@@ -91,7 +104,7 @@ func (s *Spline) Evaluate(x float64) (float64, int, error) {
 }
 
 func (s *Spline) SecondDerivative(x float64) (float64, error) {
-	if x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
+	if math.IsNaN(x) || math.IsInf(x, 0) || x < s.X[0]-1e-12 || x > s.X[len(s.X)-1]+1e-12 {
 		return 0, fmt.Errorf("spline: x=%g вне диапазона", x)
 	}
 	for i := 1; i < len(s.X); i++ {

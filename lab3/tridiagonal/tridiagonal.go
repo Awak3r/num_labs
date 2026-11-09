@@ -21,7 +21,9 @@ func Solve(main, super, sub, d []float64) ([]float64, error) {
 	if math.Abs(main[0]) < matrix.Eps {
 		return nil, fmt.Errorf("tridiagonal: нулевой опорный элемент на шаге 0")
 	}
-	alpha[0] = -super[0] / main[0]
+	if n > 1 {
+		alpha[0] = -super[0] / main[0]
+	}
 	beta[0] = d[0] / main[0]
 	for i := 1; i < n; i++ {
 		denom := main[i] + sub[i-1]*alpha[i-1]

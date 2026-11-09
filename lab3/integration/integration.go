@@ -1,6 +1,9 @@
 package integration
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type Method struct {
 	Name string
@@ -77,13 +80,35 @@ func Simpson(f func(float64) float64, a, b float64, n int) (float64, error) {
 	return sum * h / 3, nil
 }
 
-func RungeRomberg(j1, j2 float64, p int) (refined, err2 float64) {
-	factor := 1
-	for i := 0; i < p; i++ {
-		factor *= 2
+// Steps проверяет, что равномерная сетка с заданным шагом покрывает весь отрезок.
+func Steps(a, b, h float64) (int, error) {
+	if !finite(a) || !finite(b) || !finite(h) || b <= a || h <= 0 {
+		return 0, fmt.Errorf("integration: нужны конечные a < b и h > 0")
 	}
-	factor--
-	refined = j2 + (j2-j1)/float64(factor)
-	err2 = (j2 - j1) / float64(factor)
-	return refined, err2
+	steps := (b - a) / h
+	n := math.Round(steps)
+	if !finite(steps) || n < 1 || n >= float64(int(^uint(0)>>1)) || math.Abs(steps-n) > 1e-9 {
+		return 0, fmt.Errorf("integration: шаг %g не делит отрезок [%g, %g] или сетка слишком велика", h, a, b)
+	}
+	return int(n), nil
+}
+
+func RungeRomberg(j1, j2, h1, h2 float64, p int) (refined, err2 float64, err error) {
+	if !finite(j1) || !finite(j2) || !finite(h1) || !finite(h2) || h2 <= 0 || h1 <= h2 || p <= 0 {
+		return 0, 0, fmt.Errorf("integration: Рунге-Ромберг требует конечных значений, h1 > h2 > 0 и p > 0")
+	}
+	factor := math.Pow(h1/h2, float64(p)) - 1
+	if !finite(factor) || factor <= 0 {
+		return 0, 0, fmt.Errorf("integration: некорректный коэффициент Рунге-Ромберга")
+	}
+	err2 = (j2 - j1) / factor
+	refined = j2 + err2
+	if !finite(refined) || !finite(err2) {
+		return 0, 0, fmt.Errorf("integration: неконечное уточнение Рунге-Ромберга")
+	}
+	return refined, err2, nil
+}
+
+func finite(v float64) bool {
+	return !math.IsNaN(v) && !math.IsInf(v, 0)
 }

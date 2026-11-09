@@ -19,6 +19,14 @@ func Compute(x, y []float64, xstar float64) (Result, error) {
 		return Result{}, fmt.Errorf("differentiation: нужно ≥4 узлов, есть %d", n)
 	}
 
+	if math.IsNaN(xstar) || math.IsInf(xstar, 0) {
+		return Result{}, fmt.Errorf("differentiation: x* должен быть конечным")
+	}
+	for i := range x {
+		if math.IsNaN(x[i]) || math.IsInf(x[i], 0) || math.IsNaN(y[i]) || math.IsInf(y[i], 0) {
+			return Result{}, fmt.Errorf("differentiation: неконечные данные в узле %d", i)
+		}
+	}
 	idx := -1
 	for i := range x {
 		if math.Abs(x[i]-xstar) < 1e-9 {
@@ -30,8 +38,11 @@ func Compute(x, y []float64, xstar float64) (Result, error) {
 		return Result{}, fmt.Errorf("differentiation: x*=%g не совпадает ни с одним узлом", xstar)
 	}
 	h := x[1] - x[0]
+	if h <= 0 || math.IsInf(h, 0) {
+		return Result{}, fmt.Errorf("differentiation: нужен конечный положительный шаг")
+	}
 	for i := 1; i < n; i++ {
-		if math.Abs(x[i]-x[i-1]-h) > 1e-9 {
+		if x[i] <= x[i-1] || math.Abs((x[i]-x[i-1])/h-1) > 1e-9 {
 			return Result{}, fmt.Errorf("differentiation: сетка неравномерная — формулы требуют равного шага")
 		}
 	}
@@ -55,18 +66,21 @@ func Compute(x, y []float64, xstar float64) (Result, error) {
 
 		if idx == 0 {
 			res.D1 = (-3*y[0] + 4*y[1] - y[2]) / (2 * h)
-			res.Used = []int{0, 1, 2}
+			res.Used = []int{0, 1, 2, 3}
 			res.D1Form = "(−3y[0] + 4y[1] − y[2]) / (2h)"
 			res.D2 = (2*y[0] - 5*y[1] + 4*y[2] - y[3]) / (h * h)
 			res.D2Form = "(2y[0] − 5y[1] + 4y[2] − y[3]) / h²"
 		} else {
 			i := n - 1
 			res.D1 = (3*y[i] - 4*y[i-1] + y[i-2]) / (2 * h)
-			res.Used = []int{i - 2, i - 1, i}
+			res.Used = []int{i - 3, i - 2, i - 1, i}
 			res.D1Form = "(3y[i] − 4y[i−1] + y[i−2]) / (2h)"
 			res.D2 = (2*y[i] - 5*y[i-1] + 4*y[i-2] - y[i-3]) / (h * h)
 			res.D2Form = "(2y[i] − 5y[i−1] + 4y[i−2] − y[i−3]) / h²"
 		}
+	}
+	if math.IsNaN(res.D1) || math.IsInf(res.D1, 0) || math.IsNaN(res.D2) || math.IsInf(res.D2, 0) {
+		return Result{}, fmt.Errorf("differentiation: неконечный результат, проверьте масштаб данных и шаг")
 	}
 	return res, nil
 }
